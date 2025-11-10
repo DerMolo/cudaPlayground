@@ -118,6 +118,8 @@ C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.3520
 C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\__msvc_xlocinfo_types.hpp
 C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include\builtin_types.h
 C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include\channel_descriptor.h
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include\cooperative_groups.h
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include\cooperative_groups\details\info.h
 C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include\crt\common_functions.h
 C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include\crt\cudacc_ext.h
 C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include\crt\device_double_functions.h
@@ -141,6 +143,9 @@ C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include\device_types.h
 C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include\driver_functions.h
 C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include\driver_types.h
 C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include\library_types.h
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include\nv\detail\__preprocessor
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include\nv\detail\__target_macros
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include\nv\target
 C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include\sm_20_atomic_functions.h
 C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include\sm_20_intrinsics.h
 C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include\sm_30_intrinsics.h

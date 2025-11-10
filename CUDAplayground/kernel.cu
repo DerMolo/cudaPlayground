@@ -3,6 +3,7 @@
 #include "device_launch_parameters.h"
 #include <iostream>
 #include <stdio.h>
+#include <cooperative_groups.h>
 
 
 float randomFloat()
@@ -19,6 +20,20 @@ __global__ void addKernel(T *c, const T *a, const T *b, const unsigned int size)
    */
     if(i < size )
         c[i] = a[i] + b[i];
+}
+
+template <typename T> 
+__global__ void reverseKernel(T* arr, const unsigned int size) {
+    auto grid = cooperative_groups::this_grid();
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i < size) {
+        T temp = arr[(size-1) - i];
+        if (i == 0 || i == size - 1)
+            printf("thread id: %d  temp: %f \n", i, temp);
+        //printf("thread id: %d  temp: %f \n", i, temp); 
+        grid.sync();
+        arr[i] = temp;
+    }
 }
 
 template <typename Ta> 
@@ -72,6 +87,28 @@ void addWithCuda(Ta* c, Ta* a, Ta* b, const unsigned int size)
 
 }
 
+template <typename T> 
+void reverseWithCuda(T* arr, const unsigned int size) {
+    T* devPtr  = 0;
+    cudaMalloc((void**)&devPtr , sizeof(T) * size);
+
+    int blocks = 1;
+    int threadSize = size;
+    if (threadSize > 1024) {
+        blocks = ceil((float)size / 1024);
+        threadSize = 1024;
+        std::cout << "arrSize exceeds per-block thread size\nBlocks calculated: " << blocks << std::endl;
+    }
+
+    cudaMemcpy(devPtr, arr, sizeof(T) * size, cudaMemcpyHostToDevice);
+
+    reverseKernel << <blocks, threadSize >> > (devPtr , size);
+
+    cudaDeviceSynchronize();
+
+    cudaMemcpy(arr, devPtr , sizeof(T)*size, cudaMemcpyDeviceToHost);
+}
+
 template <typename T>
 void printArr(int start,int end, T arr[]) {
     for (int i = start; i < end; i++)
@@ -81,12 +118,12 @@ void printArr(int start,int end, T arr[]) {
 
 int main()
 {
-    std::cout << "max per-grid thread size: " << pow(2, 31) << std::endl;
+    /*
+        std::cout << "max per-grid thread size: " << pow(2, 31) << std::endl;
     unsigned int arraySize = 3000;
     std::cout << "assign arraySize: " << std::endl;
     std::cin >> arraySize;
 
-    //initializes random "vectors" 
      float* a = new float[arraySize];
      float* b= new float[arraySize];
      for (int i = 0; i < arraySize; i++) {
@@ -99,9 +136,9 @@ int main()
 
     //float c[arraySize] = { 0 };
     float* c = new float[arraySize];
-    //c = {0};
+
     // Add vectors in parallel.
-    //cudaError_t  = 
+
    addWithCuda(c, a, b, arraySize);
 
    std::cout << "printing 20 final elements of passed arrays" << std::endl;
@@ -115,14 +152,27 @@ int main()
     cudaDeviceReset();
     // cudaDeviceReset must be called before exiting in order for profiling and
     // tracing tools such as Nsight and Visual Profiler to show complete traces.
-    /*
-        = cudaDeviceReset();
-    if ( != cudaSuccess) {
-        fprintf(stderr, "cudaDeviceReset failed!");
-        return 1;
-    }
+
     */
- 
+    unsigned int arrSize = 3000;
+    std::cout << "assign arraySize: " << std::endl;
+    std::cin >> arrSize;
+    
+    float* a = new float[arrSize];
+    for (int i = 0; i < arrSize; i++) {
+        a[i] = randomFloat();
+    }
+    
+    //printArr(0, arrSize,a);
+    printArr(arrSize - 5, arrSize, a);
+    printArr(0, 5, a);
+
+    reverseWithCuda(a, arrSize);
+
+    printArr(arrSize - 5, arrSize, a);
+    printArr(0, 5, a);
+
+    cudaDeviceReset();
     return 0;
 }
 
