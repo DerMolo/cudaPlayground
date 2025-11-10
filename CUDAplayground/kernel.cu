@@ -1,4 +1,3 @@
-
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 #include <iostream>
@@ -14,17 +13,19 @@ float randomFloat()
 template <typename T>
 __global__ void reverseKernel(T* arr, const unsigned int size) {
     //auto grid = cooperative_groups::this_grid();
-    __shared__ bool syncBlock[4];
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     if (i < size) {
         T temp = arr[(size - 1) - i];
 
         int targetBlock = ((size - 1) - i) / 1024;
         __syncthreads();
-        syncBlock[blockIdx.x] = true;
         int wait = 0;
-        while (wait == 10000) { wait++; } //momentary block for synchronization (across all threads instead of a block) 
+        while (wait == 10000000) { wait++; } //momentary block for synchronization (across all threads instead of a block) 
+        //this is very inconsistent 
+        // a grid-blocking function is needed 
+        // or a timer that scales in relation to the grid/block size 
         arr[i] = temp;
+          //  printf("temp: %f  arr[i]: %f\n", temp, arr[i]);
     }
 }
 
@@ -115,7 +116,6 @@ void reverseWithCuda(T* arr, const unsigned int size) {
     int threads = size;
     calcBlockAndThreads(threads, blocks);
 
-
     cudaMemcpy(devPtr, arr, sizeof(T) * size, cudaMemcpyHostToDevice);
 
     /*
@@ -124,7 +124,7 @@ void reverseWithCuda(T* arr, const unsigned int size) {
     void* kernelArgs[] = { &devPtr, &size};
     cudaLaunchCooperativeKernel((void*)reverseKernel, 1, blocks, kernelArgs);
     */
-    reverseKernel << <blocks, threadSize >> > (devPtr, size);
+    reverseKernel << <blocks, threads >> > (devPtr, size);
 
     cudaDeviceSynchronize();
 
@@ -237,17 +237,45 @@ int main()
     printArr(0, 5, a);
     */
     printf("printing arr\n");
-    if (arrSize <= 50)
+    if (arrSize <= 50) {
+        printf("\nlast set of elements: \n");
+        printArr(arrSize - 10, arrSize, a);
+        printf("\nfirst set of elements: \n");
         printArr(0, arrSize, a);
-    else
-        printArr(0,50,a);
-    float* target = new float;
+    }
+    else{
+        printf("\nlast set of elements: \n");
+        printArr(arrSize - 10, arrSize, a);
+        printf("\nFirst set of elements: \n");
+        printArr(0, 10, a);
+    }
+
+
+    reverseWithCuda(a, arrSize);
+
+    printf("\n\nreversed Arr: \n");
+    if (arrSize <= 50) {
+        printf("last set of elements: \n");
+        printArr(arrSize - 10, arrSize, a);
+        printf("first set of elements: \n");
+        printArr(0, arrSize, a);
+    }
+    else {
+        printf("last set of elements: \n");
+        printArr(arrSize - 10, arrSize, a);
+        printf("First set of elements: \n");
+        printArr(0, 9, a);
+    }
+    /*
+        float* target = new float;
     *target = randomFloat();
     bool output = searchWithCuda(a, target, arrSize);
     if(output)
         printf("\nTARGET: %f, TARGET FOUND: %d", *target,output);
     else 
         printf("\nTARGET: %f, TARGET NOT FOUND: %d", *target,output);
+    */
+
 
     cudaDeviceReset();
 
