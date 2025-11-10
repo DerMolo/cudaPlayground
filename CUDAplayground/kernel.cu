@@ -7,7 +7,7 @@
 
 float randomFloat()
 { return (float)rand() / (float)RAND_MAX; } //where x = rand() 
-//essentially extracts a random value from a scope RAND_MIN < x < RAND_MAX and determines x's percent value (ranging from 0 to 1) 
+//extracts a random value from a scope RAND_MIN < x < RAND_MAX and determines x's percent value (ranging from 0 to 1) 
 
 
 template <typename T> 
@@ -35,14 +35,7 @@ void addWithCuda(Ta* c, Ta* a, Ta* b, const unsigned int size)
      //Syntax notes: 
      /* 
      1) devPtr : pointer to the location of the allocated memory (stored on the CPU
-      2) memSize: size of the allocated memory in bytes 
-
-        cudaMalloc description: 
-        stores address of the device's allocated memory into devPtr.
-        CPU-to-GPU pointer references (without invoking cudMemcpy) will result in a crash.                          
-                                                                                                                    
-        the function enables data exchange between the GPU and CPU                                                  
-                                                                                                                    
+      2) memSize: size of the allocated memory in bytes                                                                                                          
      */                                                                                                             
                                                                                                                     
     // Copy input vectors from host memory to GPU buffers.                                                          
@@ -99,12 +92,10 @@ int main()
 
     //float c[arraySize] = { 0 };
     float* c = new float[arraySize];
-    //c = {0};
     // Add vectors in parallel.
     //cudaError_t  = 
    addWithCuda(c, a, b, arraySize);
 
-   std::cout << "printing 20 final elements of passed arrays" << std::endl;
    printArr(arraySize - 20, arraySize, a);
    std::cout << "+ \n";
    printArr(arraySize - 20, arraySize, b);
@@ -115,13 +106,6 @@ int main()
     cudaDeviceReset();
     // cudaDeviceReset must be called before exiting in order for profiling and
     // tracing tools such as Nsight and Visual Profiler to show complete traces.
-    /*
-        = cudaDeviceReset();
-    if ( != cudaSuccess) {
-        fprintf(stderr, "cudaDeviceReset failed!");
-        return 1;
-    }
-    */
  
     return 0;
 }
